@@ -18,13 +18,20 @@ use ibc_proto::Protobuf;
 use tendermint::chain::id::MAX_LENGTH as MaxChainIdLen;
 use tendermint::trust_threshold::TrustThresholdFraction as TendermintTrustThresholdFraction;
 use tendermint_light_client_verifier::options::Options;
-use tendermint_light_client_verifier::ProdVerifier;
 
 use crate::error::Error;
 use crate::header::Header as TmHeader;
 use crate::trust_threshold::TrustThreshold;
 
 pub const TENDERMINT_CLIENT_STATE_TYPE_URL: &str = "/ibc.lightclients.tendermint.v1.ClientState";
+
+#[cfg(target_os = "solana")]
+mod solana_verifier;
+#[cfg(target_os = "solana")]
+type ProdVerifier = solana_verifier::Verifier;
+
+#[cfg(not(target_os = "solana"))]
+type ProdVerifier = tendermint_light_client_verifier::ProdVerifier;
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
