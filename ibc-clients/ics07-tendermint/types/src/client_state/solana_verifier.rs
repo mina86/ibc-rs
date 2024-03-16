@@ -28,20 +28,20 @@ impl tendermint::crypto::signature::Verifier for SigVerifier {
         } else {
             return Err(Error::UnsupportedKeyType);
         };
-        let pubkey = <&solana_ed25519::PubKey>::try_from(pubkey.as_bytes())
+        let pubkey = <&sigverify::ed25519::PubKey>::try_from(pubkey.as_bytes())
             .map_err(|_| Error::MalformedPublicKey)?;
-        let sig = <&solana_ed25519::Signature>::try_from(signature.as_bytes())
+        let sig = <&sigverify::ed25519::Signature>::try_from(signature.as_bytes())
             .map_err(|_| Error::MalformedSignature)?;
 
         // SAFETY: The function is always safe to run and if it returns non-null
         // than it returns a pointer to an object with static lifetime thus it’s
         // always sound to dereference it.
-        let verifier: Option<&solana_ed25519::Verifier> = unsafe {
+        let verifier: Option<&sigverify::Verifier> = unsafe {
             let ptr = get_global_ed25519_verifier() as *mut ();
             core::ptr::NonNull::new(ptr).map(|ptr| ptr.cast().as_ref())
         };
         match verifier {
-            Some(verifier) if verifier.exists(msg, pubkey, sig) => Ok(()),
+            Some(verifier) if verifier.verify(msg, pubkey.as_ref(), sig.as_ref()).unwrap() => Ok(()),
             _ => Err(Error::VerificationFailed),
         }
     }
