@@ -6,6 +6,7 @@ use ibc_primitives::prelude::*;
 use ibc_proto::google::protobuf::Any;
 use ibc_proto::ibc::lightclients::tendermint::v1::ConsensusState as RawConsensusState;
 use ibc_proto::Protobuf;
+use prost::Message;
 use tendermint::hash::Algorithm;
 use tendermint::time::Time;
 use tendermint::Hash;
@@ -106,16 +107,12 @@ impl TryFrom<Any> for ConsensusState {
     type Error = ClientError;
 
     fn try_from(raw: Any) -> Result<Self, Self::Error> {
-        fn decode_consensus_state(value: &[u8]) -> Result<ConsensusState, ClientError> {
-            let client_state =
-                Protobuf::<RawConsensusState>::decode(value).map_err(|e| ClientError::Other {
-                    description: e.to_string(),
-                })?;
-            Ok(client_state)
+        fn decode(value: &[u8]) -> Result<ConsensusState, Error> {
+            RawConsensusState::decode(value)?.try_into()
         }
 
         match raw.type_url.as_str() {
-            TENDERMINT_CONSENSUS_STATE_TYPE_URL => decode_consensus_state(&raw.value),
+            TENDERMINT_CONSENSUS_STATE_TYPE_URL => Ok(decode(&raw.value)?),
             _ => Err(ClientError::UnknownConsensusStateType {
                 consensus_state_type: raw.type_url,
             }),

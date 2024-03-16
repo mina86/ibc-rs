@@ -12,6 +12,7 @@ use ibc_proto::google::protobuf::Any;
 use ibc_proto::ibc::lightclients::tendermint::v1::Header as RawHeader;
 use ibc_proto::Protobuf;
 use pretty::{PrettySignedHeader, PrettyValidatorSet};
+use prost::Message;
 use tendermint::block::signed_header::SignedHeader;
 use tendermint::chain::Id as TmChainId;
 use tendermint::validator::Set as ValidatorSet;
@@ -186,14 +187,12 @@ impl TryFrom<Any> for Header {
     type Error = ClientError;
 
     fn try_from(raw: Any) -> Result<Self, Self::Error> {
-        fn decode_header(value: &[u8]) -> Result<Header, ClientError> {
-            let header = Protobuf::<RawHeader>::decode(value).map_err(|e| ClientError::Other {
-                description: e.to_string(),
-            })?;
-            Ok(header)
+        fn decode(value: &[u8]) -> Result<Header, Error> {
+            RawHeader::decode(value)?.try_into()
         }
+
         match raw.type_url.as_str() {
-            TENDERMINT_HEADER_TYPE_URL => decode_header(&raw.value),
+            TENDERMINT_HEADER_TYPE_URL => Ok(decode(raw.value.as_slice())?),
             _ => Err(ClientError::UnknownHeaderType {
                 header_type: raw.type_url,
             }),
