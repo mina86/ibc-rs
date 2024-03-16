@@ -40,7 +40,7 @@ parity-scale-codec = { workspace = true, optional = true }
 scale-info         = { workspace = true, optional = true }
 
 # Solana and Composable specific
-solana-ed25519 = { git = "https://github.com/ComposableFi/emulated-light-client/", branch = "master", default-features = false }
+solana-signature-verifier = { git = "https://github.com/ComposableFi/emulated-light-client/", branch = "master", default-features = false }
 
 [dev-dependencies]
 serde_json     = { workspace = true }
