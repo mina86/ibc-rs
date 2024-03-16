@@ -41,7 +41,7 @@ impl tendermint::crypto::signature::Verifier for SigVerifier {
             core::ptr::NonNull::new(ptr).map(|ptr| ptr.cast().as_ref())
         };
         match verifier {
-            Some(verifier) if verifier.verify(msg, pubkey, sig) => Ok(()),
+            Some(verifier) if verifier.verify(msg, pubkey.as_ref(), sig.as_ref()).unwrap() => Ok(()),
             _ => Err(Error::VerificationFailed),
         }
     }
