@@ -6,6 +6,7 @@ use ibc_primitives::prelude::*;
 use ibc_proto::google::protobuf::Any;
 use ibc_proto::ibc::lightclients::tendermint::v1::Misbehaviour as RawMisbehaviour;
 use ibc_proto::Protobuf;
+use prost::Message;
 
 use crate::error::Error;
 use crate::header::Header;
@@ -110,15 +111,11 @@ impl TryFrom<Any> for Misbehaviour {
     type Error = ClientError;
 
     fn try_from(raw: Any) -> Result<Self, ClientError> {
-        fn decode_misbehaviour(value: &[u8]) -> Result<Misbehaviour, ClientError> {
-            let misbehaviour =
-                Protobuf::<RawMisbehaviour>::decode(value).map_err(|e| ClientError::Other {
-                    description: e.to_string(),
-                })?;
-            Ok(misbehaviour)
+        fn decode(value: &[u8]) -> Result<Misbehaviour, Error> {
+            RawMisbehaviour::decode(value)?.try_into()
         }
         match raw.type_url.as_str() {
-            TENDERMINT_MISBEHAVIOUR_TYPE_URL => decode_misbehaviour(&raw.value),
+            TENDERMINT_MISBEHAVIOUR_TYPE_URL => Ok(decode(&raw.value)?),
             _ => Err(ClientError::UnknownMisbehaviourType {
                 misbehaviour_type: raw.type_url,
             }),

@@ -51,6 +51,8 @@ pub enum Error {
     NegativeMaxClockDrift,
     /// missing latest height
     MissingLatestHeight,
+    /// decode error: `{0}`
+    Decode(prost::DecodeError),
     /// invalid raw header error: `{0}`
     InvalidRawHeader(TendermintError),
     /// invalid raw misbehaviour: `{reason}`
@@ -116,6 +118,12 @@ impl From<Error> for ClientError {
 impl From<IdentifierError> for Error {
     fn from(e: IdentifierError) -> Self {
         Self::InvalidIdentifier(e)
+    }
+}
+
+impl From<prost::DecodeError> for Error {
+    fn from(e: prost::DecodeError) -> Self {
+        Self::Decode(e)
     }
 }
 
