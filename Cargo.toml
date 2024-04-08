@@ -61,6 +61,12 @@ serde               = { version = "1.0", default-features = false }
 serde_json          = { package = "serde-json-wasm", version = "1.0.1", default-features = false }
 subtle-encoding     = { version = "0.5", default-features = false }
 prost = { version = "0.12.3", default-features = false }
+bytes = { version = "1.5.0", default-features = false }
+sha3 = {version = "0.10.2", default-features = false }
+ripemd = {version = "0.1.1", default-features = false }
+blake2 = { version = "0.10.6", default-features = false }
+blake3 = { version = "1.5.0" }
+solana-program = { version = "1.17.7" }
 
 # ibc dependencies
 ibc                 = { version = "0.50.0", path = "./ibc", default-features = false }
@@ -107,3 +113,12 @@ tendermint-testgen               = { version = "0.34.0", default-features = fals
 # parity dependencies
 parity-scale-codec = { version = "3.6.5", default-features = false, features = ["full"] }
 scale-info         = { version = "2.10.0", default-features = false, features = ["derive"] }
+
+[patch.crates-io]
+aes-gcm-siv = { git = "https://github.com/RustCrypto/AEADs", rev = "6105d7a5591aefa646a95d12b5e8d3f55a9214ef" }
+curve25519-dalek = { git = "https://github.com/mina86/curve25519-dalek", rev = "8274d5cbb6fc3f38cdc742b4798173895cd2a290" }
+ics23 = { path = "../ics23/rust" }
+tendermint = { path = "../tendermint-rs/tendermint" }
+tendermint-light-client = { path = "../tendermint-rs/light-client" }
+tendermint-light-client-verifier = { path = "../tendermint-rs/light-client-verifier" }
+tendermint-proto = { path = "../tendermint-rs/proto" }
