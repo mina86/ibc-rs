@@ -8,6 +8,8 @@ use ibc_core_host::types::identifiers::ClientId;
 use ibc_core_host::types::path::ClientConsensusStatePath;
 use ibc_primitives::prelude::*;
 use ibc_primitives::Timestamp;
+use tendermint::crypto::Sha256;
+use tendermint::merkle::MerkleHash;
 use tendermint_light_client_verifier::Verifier;
 
 use super::TmValidationContext;
@@ -15,7 +17,7 @@ use crate::context::{ConsensusStateConverter, TmVerifier};
 
 /// Determines whether or not two conflicting headers at the same height would
 /// have convinced the light client.
-pub fn verify_misbehaviour<V>(
+pub fn verify_misbehaviour<V, H>(
     client_state: &ClientStateType,
     ctx: &V,
     client_id: &ClientId,
@@ -25,8 +27,9 @@ pub fn verify_misbehaviour<V>(
 where
     V: TmValidationContext,
     V::ConsensusStateRef: ConsensusStateConverter,
+    H: MerkleHash + Sha256 + Default,
 {
-    misbehaviour.validate_basic()?;
+    misbehaviour.validate_basic::<H>()?;
 
     let header_1 = misbehaviour.header1();
     let trusted_consensus_state_1 = {
@@ -54,14 +57,14 @@ where
 
     let current_timestamp = ctx.host_timestamp()?;
 
-    verify_misbehaviour_header(
+    verify_misbehaviour_header::<H>(
         client_state,
         header_1,
         &trusted_consensus_state_1,
         current_timestamp,
         verifier,
     )?;
-    verify_misbehaviour_header(
+    verify_misbehaviour_header::<H>(
         client_state,
         header_2,
         &trusted_consensus_state_2,
@@ -70,15 +73,18 @@ where
     )
 }
 
-pub fn verify_misbehaviour_header(
+pub fn verify_misbehaviour_header<H>(
     client_state: &ClientStateType,
     header: &TmHeader,
     trusted_consensus_state: &ConsensusStateType,
     current_timestamp: Timestamp,
     verifier: &impl TmVerifier,
-) -> Result<(), ClientError> {
+) -> Result<(), ClientError>
+where
+    H: MerkleHash + Sha256 + Default,
+{
     // ensure correctness of the trusted next validator set provided by the relayer
-    header.check_trusted_next_validator_set(trusted_consensus_state)?;
+    header.check_trusted_next_validator_set::<H>(trusted_consensus_state)?;
 
     // ensure trusted consensus state is within trusting period
     {

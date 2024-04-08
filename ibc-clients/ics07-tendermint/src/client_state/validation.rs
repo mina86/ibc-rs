@@ -9,6 +9,8 @@ use ibc_core_host::types::identifiers::ClientId;
 use ibc_core_host::types::path::ClientConsensusStatePath;
 use ibc_primitives::prelude::*;
 use ibc_primitives::proto::Any;
+use tendermint::crypto::Sha256;
+use tendermint::merkle::MerkleHash;
 
 use super::{
     check_for_misbehaviour_misbehavior, check_for_misbehaviour_update_client, ClientState,
@@ -33,7 +35,7 @@ where
         client_id: &ClientId,
         client_message: Any,
     ) -> Result<(), ClientError> {
-        verify_client_message(
+        verify_client_message::<V, tendermint::crypto::default::Sha256>(
             self.inner(),
             ctx,
             client_id,
@@ -65,7 +67,7 @@ where
 /// function, except for an additional `verifier` parameter that allows users
 /// who require custom verification logic to easily pass in their own verifier
 /// implementation.
-pub fn verify_client_message<V>(
+pub fn verify_client_message<V, H>(
     client_state: &ClientStateType,
     ctx: &V,
     client_id: &ClientId,
@@ -75,15 +77,16 @@ pub fn verify_client_message<V>(
 where
     V: TmValidationContext,
     V::ConsensusStateRef: ConsensusStateConverter,
+    H: MerkleHash + Sha256 + Default,
 {
     match client_message.type_url.as_str() {
         TENDERMINT_HEADER_TYPE_URL => {
             let header = TmHeader::try_from(client_message)?;
-            verify_header(client_state, ctx, client_id, &header, verifier)
+            verify_header::<V, H>(client_state, ctx, client_id, &header, verifier)
         }
         TENDERMINT_MISBEHAVIOUR_TYPE_URL => {
             let misbehaviour = TmMisbehaviour::try_from(client_message)?;
-            verify_misbehaviour(client_state, ctx, client_id, &misbehaviour, verifier)
+            verify_misbehaviour::<V, H>(client_state, ctx, client_id, &misbehaviour, verifier)
         }
         _ => Err(ClientError::InvalidUpdateClientMessage),
     }
