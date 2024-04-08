@@ -35,10 +35,9 @@ where
 
     let client_val_ctx_b = ctx_b.get_client_validation_context();
 
-    let client_state_of_b_on_a =
-        Ctx::HostClientState::try_from(msg.client_state_of_b_on_a.clone())?;
-
-    ctx_b.validate_self_client(client_state_of_b_on_a)?;
+    // let client_state_of_b_on_a =
+    //     Ctx::HostClientState::try_from(msg.client_state_of_b_on_a.clone())?;
+    // ctx_b.validate_self_client(client_state_of_b_on_a)?;
 
     let host_height = ctx_b.host_height().map_err(|_| ConnectionError::Other {
         description: "failed to get host height".to_string(),
@@ -75,7 +74,6 @@ where
 
         let prefix_on_a = vars.conn_end_on_b.counterparty().prefix();
         let prefix_on_b = ctx_b.commitment_prefix();
-
         {
             let expected_conn_end_on_a = ConnectionEnd::new(
                 State::Init,
@@ -117,7 +115,6 @@ where
             msg.consensus_height_of_b_on_a.revision_number(),
             msg.consensus_height_of_b_on_a.revision_height(),
         );
-
         client_state_of_a_on_b
             .verify_membership(
                 prefix_on_a,
@@ -165,14 +162,12 @@ where
     ctx_b.emit_ibc_event(IbcEvent::Message(MessageEvent::Connection))?;
     ctx_b.emit_ibc_event(event)?;
     ctx_b.log_message("success: conn_open_try verification passed".to_string())?;
-
     ctx_b.increase_connection_counter()?;
     ctx_b.store_connection_to_client(
         &ClientConnectionPath::new(msg.client_id_on_b),
         vars.conn_id_on_b.clone(),
     )?;
     ctx_b.store_connection(&ConnectionPath::new(&vars.conn_id_on_b), vars.conn_end_on_b)?;
-
     Ok(())
 }
 

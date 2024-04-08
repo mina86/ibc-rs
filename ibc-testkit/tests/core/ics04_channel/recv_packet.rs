@@ -96,7 +96,7 @@ fn recv_packet_fail_no_channel(fixture: Fixture) {
 
     let msg_envelope = MsgEnvelope::from(PacketMsg::from(msg));
 
-    let res = validate(&context, &router, msg_envelope);
+    let res = validate(&context, &router, msg_envelope, None);
 
     assert!(
         res.is_err(),
@@ -156,7 +156,7 @@ fn recv_packet_validate_happy_path(fixture: Fixture) {
 
     let msg_envelope = MsgEnvelope::from(PacketMsg::from(msg));
 
-    let res = validate(&context, &router, msg_envelope);
+    let res = validate(&context, &router, msg_envelope, None);
 
     assert!(
         res.is_ok(),
@@ -208,7 +208,7 @@ fn recv_packet_timeout_expired(fixture: Fixture) {
         .with_send_sequence(PortId::transfer(), ChannelId::zero(), 1.into())
         .with_height(host_height);
 
-    let res = validate(&context, &router, msg_envelope);
+    let res = validate(&context, &router, msg_envelope, None);
 
     assert!(
         res.is_err(),
@@ -238,7 +238,7 @@ fn recv_packet_execute_happy_path(fixture: Fixture) {
 
     let msg_env = MsgEnvelope::from(PacketMsg::from(msg));
 
-    let res = execute(&mut ctx, &mut router, msg_env);
+    let res = execute(&mut ctx, &mut router, msg_env, None);
 
     assert!(res.is_ok());
 

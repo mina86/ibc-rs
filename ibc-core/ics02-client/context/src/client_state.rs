@@ -113,6 +113,13 @@ where
         client_message: Any,
     ) -> Result<(), ClientError>;
 
+    fn verify_tm_client_message(
+        &self,
+        ctx: &V,
+        client_id: &ClientId,
+        client_message: Option<ibc_client_tendermint_types::Header>,
+    ) -> Result<(), ClientError>;
+
     /// Checks for evidence of a misbehaviour in Header or Misbehaviour type. It
     /// assumes the client_message has already been verified.
     fn check_for_misbehaviour(
@@ -120,6 +127,13 @@ where
         ctx: &V,
         client_id: &ClientId,
         client_message: Any,
+    ) -> Result<bool, ClientError>;
+
+    fn check_for_tm_misbehaviour(
+        &self,
+        ctx: &V,
+        client_id: &ClientId,
+        client_message: Option<ibc_client_tendermint_types::Header>,
     ) -> Result<bool, ClientError>;
 
     /// Returns the status of the client. Only Active clients are allowed to process packets.
@@ -161,6 +175,13 @@ where
         ctx: &mut E,
         client_id: &ClientId,
         header: Any,
+    ) -> Result<Vec<Height>, ClientError>;
+
+    fn update_tm_state(
+        &self,
+        ctx: &mut E,
+        client_id: &ClientId,
+        header: Option<ibc_client_tendermint_types::Header>,
     ) -> Result<Vec<Height>, ClientError>;
 
     /// update_state_on_misbehaviour should perform appropriate state changes on

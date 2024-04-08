@@ -69,7 +69,7 @@ fn conn_open_try_fixture(ctx_variant: Ctx, msg_variant: Msg) -> Fixture<MsgConne
 fn conn_open_try_validate(fxt: &Fixture<MsgConnectionOpenTry>, expect: Expect) {
     let router = MockRouter::new_with_transfer();
     let msg_envelope = MsgEnvelope::from(ConnectionMsg::from(fxt.msg.clone()));
-    let res = validate(&fxt.ctx, &router, msg_envelope);
+    let res = validate(&fxt.ctx, &router, msg_envelope, None);
     let err_msg = fxt.generate_error_msg(&expect, "validation", &res);
     match expect {
         Expect::Failure(_) => {
@@ -84,7 +84,7 @@ fn conn_open_try_validate(fxt: &Fixture<MsgConnectionOpenTry>, expect: Expect) {
 fn conn_open_try_execute(fxt: &mut Fixture<MsgConnectionOpenTry>, expect: Expect) {
     let mut router = MockRouter::new_with_transfer();
     let msg_envelope = MsgEnvelope::from(ConnectionMsg::from(fxt.msg.clone()));
-    let res = execute(&mut fxt.ctx, &mut router, msg_envelope);
+    let res = execute(&mut fxt.ctx, &mut router, msg_envelope, None);
     let err_msg = fxt.generate_error_msg(&expect, "execution", &res);
     match expect {
         Expect::Failure(_) => {

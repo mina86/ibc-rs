@@ -44,6 +44,21 @@ where
         )
     }
 
+    fn verify_tm_client_message(
+        &self,
+        ctx: &V,
+        client_id: &ClientId,
+        client_message: Option<ibc_client_tendermint_types::Header>,
+    ) -> Result<(), ClientError> {
+        verify_tm_client_message::<V, tendermint::crypto::default::Sha256>(
+            self.inner(),
+            ctx,
+            client_id,
+            client_message,
+            &DefaultVerifier,
+        )
+    }
+
     fn check_for_misbehaviour(
         &self,
         ctx: &V,
@@ -51,6 +66,15 @@ where
         client_message: Any,
     ) -> Result<bool, ClientError> {
         check_for_misbehaviour(self.inner(), ctx, client_id, client_message)
+    }
+
+    fn check_for_tm_misbehaviour(
+        &self,
+        ctx: &V,
+        client_id: &ClientId,
+        client_message: Option<ibc_client_tendermint_types::Header>,
+    ) -> Result<bool, ClientError> {
+        check_for_tm_misbehaviour(self.inner(), ctx, client_id, client_message)
     }
 
     fn status(&self, ctx: &V, client_id: &ClientId) -> Result<Status, ClientError> {
@@ -90,6 +114,27 @@ where
         }
         _ => Err(ClientError::InvalidUpdateClientMessage),
     }
+}
+
+pub fn verify_tm_client_message<V, H>(
+    client_state: &ClientStateType,
+    ctx: &V,
+    client_id: &ClientId,
+    client_message: Option<ibc_client_tendermint_types::Header>,
+    verifier: &impl TmVerifier,
+) -> Result<(), ClientError>
+where
+    V: TmValidationContext,
+    V::ConsensusStateRef: ConsensusStateConverter,
+    H: MerkleHash + Sha256 + Default,
+{
+    verify_header::<V, H>(
+        client_state,
+        ctx,
+        client_id,
+        &client_message.unwrap(),
+        verifier,
+    )
 }
 
 /// Check for misbehaviour on the client state as part of the client state
@@ -145,6 +190,19 @@ where
         }
         _ => Err(ClientError::InvalidUpdateClientMessage),
     }
+}
+
+pub fn check_for_tm_misbehaviour<V>(
+    client_state: &ClientStateType,
+    ctx: &V,
+    client_id: &ClientId,
+    client_message: Option<ibc_client_tendermint_types::Header>,
+) -> Result<bool, ClientError>
+where
+    V: TmValidationContext,
+    V::ConsensusStateRef: ConsensusStateConverter,
+{
+    check_for_misbehaviour_update_client(client_state, ctx, client_id, client_message.unwrap())
 }
 
 /// Query the status of the client state.

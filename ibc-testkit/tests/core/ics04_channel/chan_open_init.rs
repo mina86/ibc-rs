@@ -63,7 +63,7 @@ fn chan_open_init_validate_happy_path(fixture: Fixture) {
         ctx, router, msg, ..
     } = fixture;
 
-    let res = validate(&ctx, &router, msg);
+    let res = validate(&ctx, &router, msg, None);
 
     assert!(res.is_ok(), "Validation succeeds; good parameters")
 }
@@ -76,7 +76,7 @@ fn chan_open_init_validate_counterparty_chan_id_set(fixture: Fixture) {
 
     let msg_envelope = MsgEnvelope::from(ChannelMsg::from(msg));
 
-    let res = validate(&ctx, &router, msg_envelope);
+    let res = validate(&ctx, &router, msg_envelope, None);
 
     assert!(
         res.is_ok(),
@@ -93,7 +93,7 @@ fn chan_open_init_execute_happy_path(fixture: Fixture) {
         ..
     } = fixture;
 
-    let res = execute(&mut ctx, &mut router, msg);
+    let res = execute(&mut ctx, &mut router, msg, None);
 
     assert!(res.is_ok(), "Execution succeeds; good parameters");
 
@@ -114,7 +114,7 @@ fn chan_open_init_execute_happy_path(fixture: Fixture) {
 fn chan_open_init_fail_no_connection(fixture: Fixture) {
     let Fixture { router, msg, .. } = fixture;
 
-    let res = validate(&MockContext::default(), &router, msg);
+    let res = validate(&MockContext::default(), &router, msg, None);
 
     assert!(
         res.is_err(),

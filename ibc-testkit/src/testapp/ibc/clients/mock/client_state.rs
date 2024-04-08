@@ -256,6 +256,15 @@ where
         Ok(())
     }
 
+    fn verify_tm_client_message(
+        &self,
+        _ctx: &V,
+        _client_id: &ClientId,
+        _client_message: Option<ibc_client_tendermint_types::Header>,
+    ) -> Result<(), ClientError> {
+        unimplemented!("Only supported for tendermint client")
+    }
+
     fn check_for_misbehaviour(
         &self,
         _ctx: &V,
@@ -278,6 +287,15 @@ where
                 header_type: header_type.to_owned(),
             }),
         }
+    }
+
+    fn check_for_tm_misbehaviour(
+        &self,
+        _ctx: &V,
+        _client_id: &ClientId,
+        _client_message: Option<ibc_client_tendermint_types::Header>,
+    ) -> Result<bool, ClientError> {
+        unimplemented!("Only supported for tendermint client");
     }
 
     fn status(&self, ctx: &V, client_id: &ClientId) -> Result<Status, ClientError> {
@@ -372,6 +390,15 @@ where
         )?;
 
         Ok(vec![header_height])
+    }
+
+    fn update_tm_state(
+        &self,
+        _ctx: &mut E,
+        _client_id: &ClientId,
+        _header: Option<ibc_client_tendermint_types::Header>,
+    ) -> Result<Vec<Height>, ClientError> {
+        unimplemented!("MockClientState does not support Tendermint headers");
     }
 
     fn update_state_on_misbehaviour(

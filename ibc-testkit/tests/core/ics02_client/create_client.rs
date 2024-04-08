@@ -41,11 +41,11 @@ fn test_create_client_ok() {
     let client_type = mock_client_type();
     let client_id = client_type.build_client_id(ctx.client_counter().unwrap());
 
-    let res = validate(&ctx, &router, msg_envelope.clone());
+    let res = validate(&ctx, &router, msg_envelope.clone(), None);
 
     assert!(res.is_ok(), "validation happy path");
 
-    let res = execute(&mut ctx, &mut router, msg_envelope);
+    let res = execute(&mut ctx, &mut router, msg_envelope, None);
 
     assert!(res.is_ok(), "execution happy path");
 
@@ -77,11 +77,11 @@ fn test_tm_create_client_ok() {
 
     let msg_envelope = MsgEnvelope::from(ClientMsg::from(msg.clone()));
 
-    let res = validate(&ctx, &router, msg_envelope.clone());
+    let res = validate(&ctx, &router, msg_envelope.clone(), None);
 
     assert!(res.is_ok(), "tendermint client validation happy path");
 
-    let res = execute(&mut ctx, &mut router, msg_envelope);
+    let res = execute(&mut ctx, &mut router, msg_envelope, None);
 
     assert!(res.is_ok(), "tendermint client execution happy path");
 
@@ -113,7 +113,7 @@ fn test_invalid_frozen_tm_client_creation() {
 
     let msg_envelope = MsgEnvelope::from(ClientMsg::from(msg.clone()));
 
-    let res = validate(&ctx, &router, msg_envelope.clone());
+    let res = validate(&ctx, &router, msg_envelope.clone(), None);
 
     assert!(matches!(
         res,

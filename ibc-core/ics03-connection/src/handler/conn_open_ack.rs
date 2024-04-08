@@ -99,7 +99,6 @@ where
                 )
                 .map_err(ConnectionError::VerifyConnectionState)?;
         }
-
         client_state_of_b_on_a
             .verify_membership(
                 prefix_on_b,
@@ -121,7 +120,6 @@ where
             msg.consensus_height_of_a_on_b.revision_number(),
             msg.consensus_height_of_a_on_b.revision_height(),
         );
-
         client_state_of_b_on_a
             .verify_membership(
                 prefix_on_b,
@@ -135,7 +133,6 @@ where
                 client_error: e,
             })?;
     }
-
     Ok(())
 }
 
@@ -161,10 +158,11 @@ where
         msg.conn_id_on_b.clone(),
         vars.client_id_on_b().clone(),
     ));
+
     ctx_a.emit_ibc_event(IbcEvent::Message(MessageEvent::Connection))?;
     ctx_a.emit_ibc_event(event)?;
 
-    ctx_a.log_message("success: conn_open_ack verification passed".to_string())?;
+    // ctx_a.log_message("success: conn_open_ack verification passed".to_string())?;
 
     {
         let new_conn_end_on_a = {

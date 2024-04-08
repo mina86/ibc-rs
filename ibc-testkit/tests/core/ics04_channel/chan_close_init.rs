@@ -69,7 +69,7 @@ fn test_chan_close_init_validate() {
 
     let router = MockRouter::new_with_transfer();
 
-    let res = validate(&context, &router, msg_envelope);
+    let res = validate(&context, &router, msg_envelope, None);
 
     assert!(
         res.is_ok(),
@@ -129,7 +129,7 @@ fn test_chan_close_init_execute() {
 
     let mut router = MockRouter::new_with_transfer();
 
-    let res = execute(&mut context, &mut router, msg_envelope);
+    let res = execute(&mut context, &mut router, msg_envelope, None);
 
     assert!(res.is_ok(), "Execution happy path");
 
