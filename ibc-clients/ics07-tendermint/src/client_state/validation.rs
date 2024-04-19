@@ -51,7 +51,7 @@ where
         client_id: &ClientId,
         client_message: Option<ibc_client_tendermint_types::Header>,
     ) -> Result<(), ClientError> {
-        verify_tm_client_message(
+        verify_tm_client_message::<V, tendermint::crypto::default::Sha256> (
             self.inner(),
             ctx,
             client_id,
@@ -107,7 +107,7 @@ where
     }
 }
 
-pub fn verify_tm_client_message<V>(
+pub fn verify_tm_client_message<V, H>(
     client_state: &ClientStateType,
     ctx: &V,
     client_id: &ClientId,
@@ -116,8 +116,9 @@ pub fn verify_tm_client_message<V>(
 ) -> Result<(), ClientError>
 where
     V: ClientValidationContext + TmValidationContext,
+    H: MerkleHash + Sha256 + Default,
 {
-    verify_header(
+    verify_header::<V, H>(
         client_state,
         ctx,
         client_id,

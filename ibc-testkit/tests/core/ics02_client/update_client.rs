@@ -95,11 +95,11 @@ fn test_update_client_ok(fixture: Fixture) {
 
     let msg_envelope = MsgEnvelope::from(ClientMsg::from(msg.clone()));
 
-    let res = validate(&ctx, &router, msg_envelope.clone());
+    let res = validate(&ctx, &router, msg_envelope.clone(), None);
 
     assert!(res.is_ok(), "validation happy path");
 
-    let res = execute(&mut ctx, &mut router, msg_envelope);
+    let res = execute(&mut ctx, &mut router, msg_envelope, None);
 
     assert!(res.is_ok(), "execution happy path");
 
@@ -164,14 +164,14 @@ fn test_update_client_with_prev_header() {
 
     // First, submit a header with `height_2` to set the client's latest
     // height to `height_2`.
-    let _ = validate(&ctx, &router, msg_2.clone());
-    let _ = execute(&mut ctx, &mut router, msg_2);
+    let _ = validate(&ctx, &router, msg_2.clone(), None);
+    let _ = execute(&mut ctx, &mut router, msg_2, None);
 
     // Then, submit a header with `height_1` to see if the client's latest
     // height remains `height_2` and the consensus state is stored at the
     // correct path (`height_1`).
-    let _ = validate(&ctx, &router, msg_1.clone());
-    let _ = execute(&mut ctx, &mut router, msg_1);
+    let _ = validate(&ctx, &router, msg_1.clone(), None);
+    let _ = execute(&mut ctx, &mut router, msg_1, None);
 
     let client_state = ctx.client_state(&client_id).unwrap();
     assert_eq!(client_state.latest_height(), height_2);
@@ -245,8 +245,8 @@ fn test_consensus_state_pruning() {
 
         let msg_envelope = MsgEnvelope::from(ClientMsg::from(msg));
 
-        let _ = validate(&ctx, &router, msg_envelope.clone());
-        let _ = execute(&mut ctx, &mut router, msg_envelope);
+        let _ = validate(&ctx, &router, msg_envelope.clone(), None);
+        let _ = execute(&mut ctx, &mut router, msg_envelope, None);
     }
 
     // Check that latest expired consensus state is pruned.
@@ -292,7 +292,7 @@ fn test_update_nonexisting_client(fixture: Fixture) {
 
     let msg_envelope = MsgEnvelope::from(ClientMsg::from(msg));
 
-    let res = validate(&ctx, &router, msg_envelope);
+    let res = validate(&ctx, &router, msg_envelope, None);
 
     assert!(res.is_err());
 }
@@ -338,10 +338,10 @@ fn test_update_synthetic_tendermint_client_adjacent_ok() {
     };
     let msg_envelope = MsgEnvelope::from(ClientMsg::from(msg.clone()));
 
-    let res = validate(&ctx, &router, msg_envelope.clone());
+    let res = validate(&ctx, &router, msg_envelope.clone(), None);
     assert!(res.is_ok());
 
-    let res = execute(&mut ctx, &mut router, msg_envelope);
+    let res = execute(&mut ctx, &mut router, msg_envelope, None);
     assert!(res.is_ok(), "result: {res:?}");
 
     let client_state = ctx.client_state(&msg.client_id).unwrap();
@@ -432,10 +432,10 @@ fn test_update_synthetic_tendermint_client_validator_change_ok() {
     };
     let msg_envelope = MsgEnvelope::from(ClientMsg::from(msg.clone()));
 
-    let res = validate(&ctx_a, &router_a, msg_envelope.clone());
+    let res = validate(&ctx_a, &router_a, msg_envelope.clone(), None);
     assert!(res.is_ok());
 
-    let res = execute(&mut ctx_a, &mut router_a, msg_envelope);
+    let res = execute(&mut ctx_a, &mut router_a, msg_envelope, None);
     assert!(res.is_ok(), "result: {res:?}");
 
     let client_state = ctx_a.client_state(&msg.client_id).unwrap();
@@ -525,7 +525,7 @@ fn test_update_synthetic_tendermint_client_validator_change_fail() {
 
     let msg_envelope = MsgEnvelope::from(ClientMsg::from(msg));
 
-    let res = validate(&ctx_a, &router, msg_envelope);
+    let res = validate(&ctx_a, &router, msg_envelope, None);
 
     assert!(res.is_err());
 }
@@ -577,10 +577,10 @@ fn test_update_synthetic_tendermint_client_non_adjacent_ok() {
 
     let msg_envelope = MsgEnvelope::from(ClientMsg::from(msg.clone()));
 
-    let res = validate(&ctx, &router, msg_envelope.clone());
+    let res = validate(&ctx, &router, msg_envelope.clone(), None);
     assert!(res.is_ok());
 
-    let res = execute(&mut ctx, &mut router, msg_envelope);
+    let res = execute(&mut ctx, &mut router, msg_envelope, None);
     assert!(res.is_ok(), "result: {res:?}");
 
     let client_state = ctx.client_state(&msg.client_id).unwrap();
@@ -711,10 +711,10 @@ fn test_update_synthetic_tendermint_client_duplicate_ok() {
 
     let msg_envelope = MsgEnvelope::from(ClientMsg::from(msg.clone()));
 
-    let res = validate(&ctx_a, &router_a, msg_envelope.clone());
+    let res = validate(&ctx_a, &router_a, msg_envelope.clone(), None);
     assert!(res.is_ok(), "result: {res:?}");
 
-    let res = execute(&mut ctx_a, &mut router_a, msg_envelope);
+    let res = execute(&mut ctx_a, &mut router_a, msg_envelope, None);
     assert!(res.is_ok(), "result: {res:?}");
 
     let client_state = ctx_a.client_state(&msg.client_id).unwrap();
@@ -767,7 +767,7 @@ fn test_update_synthetic_tendermint_client_lower_height() {
 
     let msg_envelope = MsgEnvelope::from(ClientMsg::from(msg));
 
-    let res = validate(&ctx, &router, msg_envelope);
+    let res = validate(&ctx, &router, msg_envelope, None);
     assert!(res.is_err());
 }
 
@@ -791,7 +791,7 @@ fn test_update_client_events(fixture: Fixture) {
     };
     let msg_envelope = MsgEnvelope::from(ClientMsg::from(msg));
 
-    let res = execute(&mut ctx, &mut router, msg_envelope);
+    let res = execute(&mut ctx, &mut router, msg_envelope, None);
     assert!(res.is_ok());
 
     let ibc_events = ctx.get_events();
@@ -842,10 +842,10 @@ fn test_misbehaviour_client_ok(fixture: Fixture) {
     let client_id = ClientId::default();
     let msg_envelope = msg_update_client(&client_id);
 
-    let res = validate(&ctx, &router, msg_envelope.clone());
+    let res = validate(&ctx, &router, msg_envelope.clone(), None);
     assert!(res.is_ok());
 
-    let res = execute(&mut ctx, &mut router, msg_envelope);
+    let res = execute(&mut ctx, &mut router, msg_envelope, None);
     assert!(res.is_ok());
 
     ensure_misbehaviour(&ctx, &client_id, &mock_client_type());
@@ -865,7 +865,7 @@ fn test_submit_misbehaviour_nonexisting_client(fixture: Fixture) {
             .latest_height(Height::new(0, 42).unwrap())
             .build(),
     );
-    let res = validate(&ctx, &router, msg_envelope);
+    let res = validate(&ctx, &router, msg_envelope, None);
     assert!(res.is_err());
 }
 
@@ -883,7 +883,7 @@ fn test_client_update_misbehaviour_nonexisting_client(fixture: Fixture) {
             .latest_height(Height::new(0, 42).unwrap())
             .build(),
     );
-    let res = validate(&ctx, &router, msg_envelope);
+    let res = validate(&ctx, &router, msg_envelope, None);
     assert!(res.is_err());
 }
 
@@ -944,9 +944,9 @@ fn test_misbehaviour_synthetic_tendermint_equivocation() {
     };
     let msg_envelope = MsgEnvelope::from(ClientMsg::from(msg));
 
-    let res = validate(&ctx_a, &router_a, msg_envelope.clone());
+    let res = validate(&ctx_a, &router_a, msg_envelope.clone(), None);
     assert!(res.is_ok());
-    let res = execute(&mut ctx_a, &mut router_a, msg_envelope);
+    let res = execute(&mut ctx_a, &mut router_a, msg_envelope, None);
     assert!(res.is_ok());
     ensure_misbehaviour(&ctx_a, &client_id, &tm_client_type());
 }
@@ -1008,9 +1008,9 @@ fn test_misbehaviour_synthetic_tendermint_bft_time() {
 
     let msg_envelope = MsgEnvelope::from(ClientMsg::from(msg));
 
-    let res = validate(&ctx_a, &router_a, msg_envelope.clone());
+    let res = validate(&ctx_a, &router_a, msg_envelope.clone(), None);
     assert!(res.is_ok());
-    let res = execute(&mut ctx_a, &mut router_a, msg_envelope);
+    let res = execute(&mut ctx_a, &mut router_a, msg_envelope, None);
     assert!(res.is_ok());
     ensure_misbehaviour(&ctx_a, &client_id, &tm_client_type());
 }
@@ -1123,6 +1123,6 @@ fn test_client_update_max_clock_drift() {
 
     let msg_envelope = MsgEnvelope::from(ClientMsg::from(msg));
 
-    let res = validate(&ctx_a, &router_a, msg_envelope);
+    let res = validate(&ctx_a, &router_a, msg_envelope, None);
     assert!(res.is_err());
 }

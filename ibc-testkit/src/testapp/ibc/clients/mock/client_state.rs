@@ -367,11 +367,11 @@ where
 
     fn update_tm_state(
         &self,
-        ctx: &mut E,
-        client_id: &ClientId,
-        header: Option<ibc_client_tendermint_types::Header>,
+        _ctx: &mut E,
+        _client_id: &ClientId,
+        _header: Option<ibc_client_tendermint_types::Header>,
     ) -> Result<Vec<Height>, ClientError> {
-        Ok(Vec::new())
+        unimplemented!("MockClientState does not support Tendermint headers");
     }
 
     fn update_state_on_misbehaviour(

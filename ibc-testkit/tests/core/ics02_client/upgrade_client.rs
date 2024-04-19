@@ -69,7 +69,7 @@ fn upgrade_client_validate(fxt: &Fixture<MsgUpgradeClient>, expect: Expect) {
     let Fixture { ctx, msg } = fxt;
     let router = MockRouter::new_with_transfer();
     let msg_envelope = MsgEnvelope::from(ClientMsg::from(msg.clone()));
-    let res = validate(ctx, &router, msg_envelope);
+    let res = validate(ctx, &router, msg_envelope, None);
     let err_msg = fxt.generate_error_msg(&expect, "validation", &res);
 
     match expect {
@@ -85,7 +85,7 @@ fn upgrade_client_validate(fxt: &Fixture<MsgUpgradeClient>, expect: Expect) {
 fn upgrade_client_execute(fxt: &mut Fixture<MsgUpgradeClient>, expect: Expect) {
     let mut router = MockRouter::new_with_transfer();
     let msg_envelope = MsgEnvelope::from(ClientMsg::from(fxt.msg.clone()));
-    let res = execute(&mut fxt.ctx, &mut router, msg_envelope);
+    let res = execute(&mut fxt.ctx, &mut router, msg_envelope, None);
     let err_msg = fxt.generate_error_msg(&expect, "execution", &res);
     match expect {
         Expect::Failure(err) => {

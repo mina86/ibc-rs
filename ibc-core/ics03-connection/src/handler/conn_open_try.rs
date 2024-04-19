@@ -110,7 +110,6 @@ where
             msg.consensus_height_of_b_on_a.revision_number(),
             msg.consensus_height_of_b_on_a.revision_height(),
         );
-        solana_program::log::sol_log_compute_units();
         client_state_of_a_on_b
             .verify_membership(
                 prefix_on_a,
@@ -158,14 +157,12 @@ where
     ctx_b.emit_ibc_event(IbcEvent::Message(MessageEvent::Connection))?;
     ctx_b.emit_ibc_event(event)?;
     ctx_b.log_message("success: conn_open_try verification passed".to_string())?;
-    solana_program::log::sol_log_compute_units();
     ctx_b.increase_connection_counter()?;
     ctx_b.store_connection_to_client(
         &ClientConnectionPath::new(msg.client_id_on_b),
         vars.conn_id_on_b.clone(),
     )?;
     ctx_b.store_connection(&ConnectionPath::new(&vars.conn_id_on_b), vars.conn_end_on_b)?;
-    solana_program::log::sol_log_compute_units();
     Ok(())
 }
 

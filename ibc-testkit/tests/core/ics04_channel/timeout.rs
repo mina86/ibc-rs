@@ -114,7 +114,7 @@ fn timeout_fail_no_channel(fixture: Fixture) {
             .build(),
     );
     let msg_envelope = MsgEnvelope::from(PacketMsg::from(msg));
-    let res = validate(&ctx, &router, msg_envelope);
+    let res = validate(&ctx, &router, msg_envelope, None);
 
     assert!(
         res.is_err(),
@@ -152,7 +152,7 @@ fn timeout_fail_no_consensus_state_for_height(fixture: Fixture) {
 
     let msg_envelope = MsgEnvelope::from(PacketMsg::from(msg));
 
-    let res = validate(&ctx, &router, msg_envelope);
+    let res = validate(&ctx, &router, msg_envelope, None);
 
     assert!(
             res.is_err(),
@@ -213,7 +213,7 @@ fn timeout_fail_proof_timeout_not_reached(fixture: Fixture) {
 
     let msg_envelope = MsgEnvelope::from(PacketMsg::from(msg));
 
-    let res = validate(&ctx, &router, msg_envelope);
+    let res = validate(&ctx, &router, msg_envelope, None);
 
     assert!(
             res.is_err(),
@@ -242,7 +242,7 @@ fn timeout_success_no_packet_commitment(fixture: Fixture) {
 
     let msg_envelope = MsgEnvelope::from(PacketMsg::from(msg));
 
-    let res = validate(&ctx, &router, msg_envelope);
+    let res = validate(&ctx, &router, msg_envelope, None);
 
     assert!(
         res.is_ok(),
@@ -295,7 +295,7 @@ fn timeout_unordered_channel_validate(fixture: Fixture) {
 
     let msg_envelope = MsgEnvelope::from(PacketMsg::from(msg));
 
-    let res = validate(&ctx, &router, msg_envelope);
+    let res = validate(&ctx, &router, msg_envelope, None);
 
     assert!(res.is_ok(), "Good parameters for unordered channels")
 }
@@ -344,7 +344,7 @@ fn timeout_ordered_channel_validate(fixture: Fixture) {
 
     let msg_envelope = MsgEnvelope::from(PacketMsg::from(msg));
 
-    let res = validate(&ctx, &router, msg_envelope);
+    let res = validate(&ctx, &router, msg_envelope, None);
 
     assert!(res.is_ok(), "Good parameters for unordered channels")
 }
@@ -376,7 +376,7 @@ fn timeout_unordered_chan_execute(fixture: Fixture) {
 
     let msg_envelope = MsgEnvelope::from(PacketMsg::from(msg));
 
-    let res = execute(&mut ctx, &mut router, msg_envelope);
+    let res = execute(&mut ctx, &mut router, msg_envelope, None);
 
     assert!(res.is_ok());
 
@@ -418,7 +418,7 @@ fn timeout_ordered_chan_execute(fixture: Fixture) {
 
     let msg_envelope = MsgEnvelope::from(PacketMsg::from(msg));
 
-    let res = execute(&mut ctx, &mut router, msg_envelope);
+    let res = execute(&mut ctx, &mut router, msg_envelope, None);
 
     assert!(res.is_ok());
 

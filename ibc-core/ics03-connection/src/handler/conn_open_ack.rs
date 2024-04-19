@@ -84,7 +84,6 @@ where
                 vars.conn_end_on_a.delay_period(),
             )?;
 
-            solana_program::log::sol_log_compute_units();
             client_state_of_b_on_a
                 .verify_membership(
                     prefix_on_b,
@@ -94,7 +93,6 @@ where
                     expected_conn_end_on_b.encode_vec(),
                 )
                 .map_err(ConnectionError::VerifyConnectionState)?;
-            solana_program::log::sol_log_compute_units();
         }
         client_state_of_b_on_a
             .verify_membership(

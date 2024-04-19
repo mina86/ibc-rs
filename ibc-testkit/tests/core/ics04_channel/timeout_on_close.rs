@@ -95,7 +95,7 @@ fn timeout_on_close_fail_no_channel(fixture: Fixture) {
 
     let msg_envelope = MsgEnvelope::from(PacketMsg::from(msg));
 
-    let res = validate(&context, &router, msg_envelope);
+    let res = validate(&context, &router, msg_envelope, None);
 
     assert!(
         res.is_err(),
@@ -120,7 +120,7 @@ fn timeout_on_close_success_no_packet_commitment(fixture: Fixture) {
 
     let msg_envelope = MsgEnvelope::from(PacketMsg::from(msg));
 
-    let res = validate(&context, &router, msg_envelope);
+    let res = validate(&context, &router, msg_envelope, None);
 
     assert!(
         res.is_ok(),
@@ -161,7 +161,7 @@ fn timeout_on_close_success_happy_path(fixture: Fixture) {
 
     let msg_envelope = MsgEnvelope::from(PacketMsg::from(msg));
 
-    let res = validate(&context, &router, msg_envelope);
+    let res = validate(&context, &router, msg_envelope, None);
 
     assert!(
         res.is_ok(),

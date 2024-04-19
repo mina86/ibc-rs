@@ -65,7 +65,7 @@ where
         client_message.clone(),
     )?;
 
-    if false {
+    if found_misbehaviour {
         client_state.update_state_on_misbehaviour(
             ctx.get_client_execution_context(),
             &client_id,

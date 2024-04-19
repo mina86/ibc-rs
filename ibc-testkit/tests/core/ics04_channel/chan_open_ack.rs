@@ -105,7 +105,7 @@ fn chan_open_ack_happy_path(fixture: Fixture) {
 
     let msg_envelope = MsgEnvelope::from(ChannelMsg::from(msg));
 
-    let res = validate(&context, &router, msg_envelope);
+    let res = validate(&context, &router, msg_envelope, None);
 
     assert!(res.is_ok(), "Validation happy path")
 }
@@ -140,7 +140,7 @@ fn chan_open_ack_execute_happy_path(fixture: Fixture) {
 
     let msg_envelope = MsgEnvelope::from(ChannelMsg::from(msg.clone()));
 
-    let res = execute(&mut context, &mut router, msg_envelope);
+    let res = execute(&mut context, &mut router, msg_envelope, None);
 
     assert!(res.is_ok(), "Execution happy path");
 
@@ -181,7 +181,7 @@ fn chan_open_ack_fail_no_connection(fixture: Fixture) {
 
     let msg_envelope = MsgEnvelope::from(ChannelMsg::from(msg));
 
-    let res = validate(&context, &router, msg_envelope);
+    let res = validate(&context, &router, msg_envelope, None);
 
     assert!(
         res.is_err(),
@@ -212,7 +212,7 @@ fn chan_open_ack_fail_no_channel(fixture: Fixture) {
 
     let msg_envelope = MsgEnvelope::from(ChannelMsg::from(msg));
 
-    let res = validate(&context, &router, msg_envelope);
+    let res = validate(&context, &router, msg_envelope, None);
 
     assert!(
         res.is_err(),
@@ -257,7 +257,7 @@ fn chan_open_ack_fail_channel_wrong_state(fixture: Fixture) {
 
     let msg_envelope = MsgEnvelope::from(ChannelMsg::from(msg));
 
-    let res = validate(&context, &router, msg_envelope);
+    let res = validate(&context, &router, msg_envelope, None);
 
     assert!(
         res.is_err(),
