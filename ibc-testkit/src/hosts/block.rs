@@ -57,7 +57,7 @@ impl From<SyntheticTmBlock> for Header {
             light_block,
         } = light_block;
         Self {
-            signed_header: light_block.signed_header,
+            signed_header: Box::new(light_block.signed_header),
             validator_set: light_block.validators,
             trusted_height,
             trusted_next_validator_set: trusted_next_validators,

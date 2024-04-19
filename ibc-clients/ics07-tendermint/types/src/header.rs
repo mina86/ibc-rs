@@ -29,8 +29,8 @@ pub const TENDERMINT_HEADER_TYPE_URL: &str = "/ibc.lightclients.tendermint.v1.He
 /// Tendermint consensus header
 #[derive(Clone, PartialEq, Eq)]
 pub struct Header {
-    pub signed_header: SignedHeader, // contains the commitment root
-    pub validator_set: ValidatorSet, // the validator set that signed Header
+    pub signed_header: Box<SignedHeader>, // contains the commitment root
+    pub validator_set: ValidatorSet,      // the validator set that signed Header
     pub trusted_height: Height, // the height of a trusted header seen by client less than or equal to Header
     pub trusted_next_validator_set: ValidatorSet, // the last trusted validator set at trusted height
 }
@@ -157,15 +157,16 @@ impl TryFrom<RawHeader> for Header {
     type Error = Error;
 
     fn try_from(raw: RawHeader) -> Result<Self, Self::Error> {
+        let signed_header = raw
+            .signed_header
+            .ok_or(Error::MissingSignedHeader)?
+            .try_into()
+            .map_err(|e| Error::InvalidHeader {
+                reason: "signed header conversion".to_string(),
+                error: e,
+            })?;
         let header = Self {
-            signed_header: raw
-                .signed_header
-                .ok_or(Error::MissingSignedHeader)?
-                .try_into()
-                .map_err(|e| Error::InvalidHeader {
-                    reason: "signed header conversion".to_string(),
-                    error: e,
-                })?,
+            signed_header: Box::new(signed_header),
             validator_set: raw
                 .validator_set
                 .ok_or(Error::MissingValidatorSet)?
@@ -217,7 +218,7 @@ impl From<Header> for Any {
 impl From<Header> for RawHeader {
     fn from(value: Header) -> Self {
         RawHeader {
-            signed_header: Some(value.signed_header.into()),
+            signed_header: Some((*value.signed_header).into()),
             validator_set: Some(value.validator_set.into()),
             trusted_height: Some(value.trusted_height.into()),
             trusted_validators: Some(value.trusted_next_validator_set.into()),

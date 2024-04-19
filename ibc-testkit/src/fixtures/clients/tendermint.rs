@@ -158,7 +158,7 @@ pub fn dummy_ics07_header() -> Header {
     let vs = ValidatorSet::new(vec![v1.clone()], Some(v1));
 
     Header {
-        signed_header: shdr,
+        signed_header: Box::new(shdr),
         validator_set: vs.clone(),
         trusted_height: Height::min(0),
         trusted_next_validator_set: vs,
