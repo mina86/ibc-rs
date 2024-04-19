@@ -37,6 +37,14 @@ pub(crate) fn impl_ClientStateValidation(
         imports,
     );
 
+    let check_for_tm_misbehaviour_impl = delegate_call_in_match(
+        client_state_enum_name,
+        enum_variants.iter(),
+        opts,
+        quote! { check_for_tm_misbehaviour(cs, ctx, client_id, client_message) },
+        imports,
+    );
+
     let status_impl = delegate_call_in_match(
         client_state_enum_name,
         enum_variants.iter(),
@@ -96,6 +104,17 @@ pub(crate) fn impl_ClientStateValidation(
             ) -> core::result::Result<bool, #ClientError> {
                 match self {
                     #(#check_for_misbehaviour_impl),*
+                }
+            }
+
+            fn check_for_tm_misbehaviour(
+                &self,
+                ctx: &#ClientValidationContext,
+                client_id: &#ClientId,
+                client_message: core::option::Option<#TMHeader>,
+            ) -> core::result::Result<bool, #ClientError> {
+                match self {
+                    #(#check_for_tm_misbehaviour_impl),*
                 }
             }
 

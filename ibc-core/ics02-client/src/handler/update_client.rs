@@ -11,7 +11,6 @@ use ibc_core_handler_types::error::ContextError;
 use ibc_core_handler_types::events::{IbcEvent, MessageEvent};
 use ibc_core_host::{ExecutionContext, ValidationContext};
 use ibc_primitives::prelude::*;
-// use ibc_primitives::ToVec;
 
 pub fn validate<Ctx>(
     ctx: &Ctx,
@@ -59,13 +58,16 @@ where
     let client_message = msg.client_message();
     let client_state = ctx.client_state(&client_id)?;
 
-    let found_misbehaviour = client_state.check_for_misbehaviour(
+    let found_misbehaviour = client_state.check_for_tm_misbehaviour(
         ctx.get_client_validation_context(),
         &client_id,
-        client_message.clone(),
+        header.clone(),
     )?;
 
     if found_misbehaviour {
+        // the client message is not deserialized so
+        // there is no need of having another method
+        // for tendermint client state.
         client_state.update_state_on_misbehaviour(
             ctx.get_client_execution_context(),
             &client_id,
@@ -86,13 +88,8 @@ where
             .into());
         }
 
-        // let header = client_message;
-
-        let consensus_heights = client_state.update_tm_state(
-            ctx.get_client_execution_context(),
-            &client_id,
-            Some(header.unwrap()),
-        )?;
+        let consensus_heights =
+            client_state.update_tm_state(ctx.get_client_execution_context(), &client_id, header)?;
 
         {
             let event = {

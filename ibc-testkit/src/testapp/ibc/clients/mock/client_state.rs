@@ -243,7 +243,7 @@ where
         _client_id: &ClientId,
         _client_message: Option<ibc_client_tendermint_types::Header>,
     ) -> Result<(), ClientError> {
-        Ok(())
+        unimplemented!("Only supported for tendermint client")
     }
 
     fn check_for_misbehaviour(
@@ -266,6 +266,15 @@ where
             }
             _ => Ok(false),
         }
+    }
+
+    fn check_for_tm_misbehaviour(
+        &self,
+        _ctx: &V,
+        _client_id: &ClientId,
+        _client_message: Option<ibc_client_tendermint_types::Header>,
+    ) -> Result<bool, ClientError> {
+        unimplemented!("Only supported for tendermint client");
     }
 
     fn status(&self, ctx: &V, client_id: &ClientId) -> Result<Status, ClientError> {

@@ -51,7 +51,7 @@ where
         client_id: &ClientId,
         client_message: Option<ibc_client_tendermint_types::Header>,
     ) -> Result<(), ClientError> {
-        verify_tm_client_message::<V, tendermint::crypto::default::Sha256> (
+        verify_tm_client_message::<V, tendermint::crypto::default::Sha256>(
             self.inner(),
             ctx,
             client_id,
@@ -67,6 +67,15 @@ where
         client_message: Any,
     ) -> Result<bool, ClientError> {
         check_for_misbehaviour(self.inner(), ctx, client_id, client_message)
+    }
+
+    fn check_for_tm_misbehaviour(
+        &self,
+        ctx: &V,
+        client_id: &ClientId,
+        client_message: Option<ibc_client_tendermint_types::Header>,
+    ) -> Result<bool, ClientError> {
+        check_for_tm_misbehaviour(self.inner(), ctx, client_id, client_message)
     }
 
     fn status(&self, ctx: &V, client_id: &ClientId) -> Result<Status, ClientError> {
@@ -125,21 +134,6 @@ where
         &client_message.unwrap(),
         verifier,
     )
-    // match client_message.type_url.as_str() {
-    //     TENDERMINT_HEADER_TYPE_URL => {
-    //         solana_program::msg!("Before header try_from");
-    //         solana_program::log::sol_log_compute_units();
-    //         let header = TmHeader::try_from(client_message)?;
-    //         solana_program::msg!("After header try_from");
-    //         solana_program::log::sol_log_compute_units();
-    //         verify_header(client_state, ctx, client_id, &header, verifier)
-    //     }
-    //     TENDERMINT_MISBEHAVIOUR_TYPE_URL => {
-    //         let misbehaviour = TmMisbehaviour::try_from(client_message)?;
-    //         verify_misbehaviour(client_state, ctx, client_id, &misbehaviour, verifier)
-    //     }
-    //     _ => Err(ClientError::InvalidUpdateClientMessage),
-    // }
 }
 
 /// Check for misbehaviour on the client state as part of the client state
@@ -194,6 +188,18 @@ where
         }
         _ => Err(ClientError::InvalidUpdateClientMessage),
     }
+}
+
+pub fn check_for_tm_misbehaviour<V>(
+    client_state: &ClientStateType,
+    ctx: &V,
+    client_id: &ClientId,
+    client_message: Option<ibc_client_tendermint_types::Header>,
+) -> Result<bool, ClientError>
+where
+    V: ClientValidationContext + TmValidationContext,
+{
+    check_for_misbehaviour_update_client(client_state, ctx, client_id, client_message.unwrap())
 }
 
 /// Query the status of the client state.

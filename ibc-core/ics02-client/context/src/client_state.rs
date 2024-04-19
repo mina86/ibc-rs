@@ -123,6 +123,13 @@ where
         client_message: Any,
     ) -> Result<bool, ClientError>;
 
+    fn check_for_tm_misbehaviour(
+        &self,
+        ctx: &V,
+        client_id: &ClientId,
+        client_message: Option<ibc_client_tendermint_types::Header>,
+    ) -> Result<bool, ClientError>;
+
     /// Returns the status of the client. Only Active clients are allowed to process packets.
     fn status(&self, ctx: &V, client_id: &ClientId) -> Result<Status, ClientError>;
 }
