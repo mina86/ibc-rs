@@ -242,7 +242,9 @@ where
         _ctx: &V,
         _client_id: &ClientId,
         _client_message: Option<ibc_client_tendermint_types::Header>,
-    ) -> Result<(), ClientError> { Ok(()) }
+    ) -> Result<(), ClientError> {
+        Ok(())
+    }
 
     fn check_for_misbehaviour(
         &self,
@@ -368,7 +370,7 @@ where
         ctx: &mut E,
         client_id: &ClientId,
         header: Option<ibc_client_tendermint_types::Header>,
-    ) -> Result<Vec<Height>, ClientError> { 
+    ) -> Result<Vec<Height>, ClientError> {
         Ok(Vec::new())
     }
 

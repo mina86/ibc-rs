@@ -9,11 +9,12 @@ use ibc_core_handler_types::error::ContextError;
 use ibc_core_handler_types::events::{IbcEvent, MessageEvent};
 use ibc_core_host::types::identifiers::{ClientId, ConnectionId};
 use ibc_core_host::types::path::{
-    ClientConnectionPath, ClientConsensusStatePath, ClientStatePath, ConnectionPath, Path
+    ClientConnectionPath, ClientConsensusStatePath, ClientStatePath, ConnectionPath, Path,
 };
 use ibc_core_host::{ExecutionContext, ValidationContext};
-use ibc_primitives::{prelude::*, ToVec};
+use ibc_primitives::prelude::*;
 use ibc_primitives::proto::Protobuf;
+use ibc_primitives::ToVec;
 
 pub fn validate<Ctx>(ctx_b: &Ctx, msg: MsgConnectionOpenTry) -> Result<(), ContextError>
 where
@@ -68,7 +69,6 @@ where
 
         let prefix_on_a = vars.conn_end_on_b.counterparty().prefix();
         let prefix_on_b = ctx_b.commitment_prefix();
-        // solana_program::log::sol_log_compute_units();
         {
             let expected_conn_end_on_a = ConnectionEnd::new(
                 State::Init,
@@ -88,7 +88,6 @@ where
                 )
                 .map_err(ConnectionError::VerifyConnectionState)?;
         }
-        // solana_program::log::sol_log_compute_units();
 
         client_state_of_a_on_b
             .verify_membership(
@@ -102,7 +101,6 @@ where
                 client_id: msg.client_id_on_b.clone(),
                 client_error: e,
             })?;
-        // solana_program::log::sol_log_compute_units();
 
         let expected_consensus_state_of_b_on_a =
             ctx_b.host_consensus_state(&msg.consensus_height_of_b_on_a)?;
@@ -125,7 +123,6 @@ where
                 height: msg.proofs_height_on_a,
                 client_error: e,
             })?;
-        // solana_program::log::sol_log_compute_units();
     }
 
     Ok(())

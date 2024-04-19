@@ -96,11 +96,7 @@ where
 {
     match client_message.type_url.as_str() {
         TENDERMINT_HEADER_TYPE_URL => {
-            // solana_program::msg!("Before header try_from");
-            // solana_program::log::sol_log_compute_units();
             let header = TmHeader::try_from(client_message)?;
-            // solana_program::msg!("After header try_from");
-            // solana_program::log::sol_log_compute_units();
             verify_header::<V, H>(client_state, ctx, client_id, &header, verifier)
         }
         TENDERMINT_MISBEHAVIOUR_TYPE_URL => {
@@ -121,7 +117,13 @@ pub fn verify_tm_client_message<V>(
 where
     V: ClientValidationContext + TmValidationContext,
 {
-    verify_header(client_state, ctx, client_id, &client_message.unwrap(), verifier)
+    verify_header(
+        client_state,
+        ctx,
+        client_id,
+        &client_message.unwrap(),
+        verifier,
+    )
     // match client_message.type_url.as_str() {
     //     TENDERMINT_HEADER_TYPE_URL => {
     //         solana_program::msg!("Before header try_from");

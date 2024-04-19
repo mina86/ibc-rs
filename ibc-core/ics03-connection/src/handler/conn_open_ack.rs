@@ -44,9 +44,7 @@ where
         .into());
     }
 
-    // solana_program::log::sol_log_compute_units();
     ctx_a.validate_self_client(msg.client_state_of_a_on_b.clone())?;
-    // solana_program::log::sol_log_compute_units();
 
     msg.version
         .verify_is_supported(vars.conn_end_on_a.versions())?;
@@ -86,8 +84,6 @@ where
                 vars.conn_end_on_a.delay_period(),
             )?;
 
-            // solana_program::msg!("This is expected connection end on b {:?}", expected_conn_end_on_b);
-            // solana_program::msg!("This is encoded connection end {:?}", expected_conn_end_on_b.clone().encode_vec());
             solana_program::log::sol_log_compute_units();
             client_state_of_b_on_a
                 .verify_membership(
@@ -100,8 +96,6 @@ where
                 .map_err(ConnectionError::VerifyConnectionState)?;
             solana_program::log::sol_log_compute_units();
         }
-        // solana_program::log::sol_log_compute_units();
-
         client_state_of_b_on_a
             .verify_membership(
                 prefix_on_b,
@@ -115,8 +109,6 @@ where
                 client_error: e,
             })?;
 
-        // solana_program::log::sol_log_compute_units();
-
         let expected_consensus_state_of_a_on_b =
             ctx_a.host_consensus_state(&msg.consensus_height_of_a_on_b)?;
 
@@ -125,7 +117,6 @@ where
             msg.consensus_height_of_a_on_b.revision_number(),
             msg.consensus_height_of_a_on_b.revision_height(),
         );
-        // solana_program::log::sol_log_compute_units();
         client_state_of_b_on_a
             .verify_membership(
                 prefix_on_b,
@@ -138,7 +129,6 @@ where
                 height: msg.proofs_height_on_b,
                 client_error: e,
             })?;
-        // solana_program::log::sol_log_compute_units();
     }
     Ok(())
 }

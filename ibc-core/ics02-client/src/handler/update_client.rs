@@ -13,7 +13,11 @@ use ibc_core_host::{ExecutionContext, ValidationContext};
 use ibc_primitives::prelude::*;
 // use ibc_primitives::ToVec;
 
-pub fn validate<Ctx>(ctx: &Ctx, msg: MsgUpdateOrMisbehaviour, header: Option<ibc_client_tendermint_types::Header>) -> Result<(), ContextError>
+pub fn validate<Ctx>(
+    ctx: &Ctx,
+    msg: MsgUpdateOrMisbehaviour,
+    header: Option<ibc_client_tendermint_types::Header>,
+) -> Result<(), ContextError>
 where
     Ctx: ValidationContext,
 {
@@ -24,26 +28,26 @@ where
     // Read client state from the host chain store. The client should already exist.
     let client_state = ctx.client_state(&client_id)?;
 
-    // client_state
-    //     .status(ctx.get_client_validation_context(), &client_id)?
-    //     .verify_is_active()?;
+    client_state
+        .status(ctx.get_client_validation_context(), &client_id)?
+        .verify_is_active()?;
 
     let _client_message = msg.client_message();
 
-    // solana_program::msg!("Before client message");
-    // solana_program::log::sol_log_compute_units();
     client_state.verify_tm_client_message(
         ctx.get_client_validation_context(),
         &client_id,
         header,
     )?;
-    // solana_program::msg!("After client message");
-    // solana_program::log::sol_log_compute_units();
 
     Ok(())
 }
 
-pub fn execute<Ctx>(ctx: &mut Ctx, msg: MsgUpdateOrMisbehaviour, header: Option<ibc_client_tendermint_types::Header>) -> Result<(), ContextError>
+pub fn execute<Ctx>(
+    ctx: &mut Ctx,
+    msg: MsgUpdateOrMisbehaviour,
+    header: Option<ibc_client_tendermint_types::Header>,
+) -> Result<(), ContextError>
 where
     Ctx: ExecutionContext,
 {
@@ -55,15 +59,11 @@ where
     let client_message = msg.client_message();
     let client_state = ctx.client_state(&client_id)?;
 
-    // solana_program::msg!("Before check for misbehavior");
-    // solana_program::log::sol_log_compute_units();
-    // let found_misbehaviour = client_state.check_for_misbehaviour(
-    //     ctx.get_client_validation_context(),
-    //     &client_id,
-    //     client_message.clone(),
-    // )?;
-    // solana_program::log::sol_log_compute_units();
-    // solana_program::msg!("After check for misbehavior");
+    let found_misbehaviour = client_state.check_for_misbehaviour(
+        ctx.get_client_validation_context(),
+        &client_id,
+        client_message.clone(),
+    )?;
 
     if false {
         client_state.update_state_on_misbehaviour(
@@ -88,22 +88,17 @@ where
 
         // let header = client_message;
 
-        // solana_program::msg!("Beofre update state");
-        // solana_program::log::sol_log_compute_units();
         let consensus_heights = client_state.update_tm_state(
             ctx.get_client_execution_context(),
             &client_id,
             Some(header.unwrap()),
         )?;
-        // solana_program::log::sol_log_compute_units();
-        // solana_program::msg!("After update state");
 
         {
             let event = {
                 let consensus_height = consensus_heights.first().ok_or(ClientError::Other {
                     description: "client update state returned no updated height".to_string(),
                 })?;
-                // ctx.log_message(format!("This is the height which was updated {:?} and height {:?}", consensus_height, consensus_heights).to_string()).unwrap();
                 IbcEvent::UpdateClient(UpdateClient::new(
                     client_id,
                     client_state.client_type(),

@@ -27,7 +27,6 @@ pub fn dispatch(
     router: &mut impl Router,
     msg: MsgEnvelope,
 ) -> Result<(), ContextError> {
-
     if matches!(msg, MsgEnvelope::Client(ClientMsg::UpdateClient(_))) {
         let header = match msg {
             MsgEnvelope::Client(ref msg) => match msg {
@@ -36,18 +35,15 @@ pub fn dispatch(
             },
             _ => panic!("Invalid message type"),
         };
-        let header = ibc_client_tendermint_types::Header::try_from(header.clone().client_message).unwrap();
+        let header =
+            ibc_client_tendermint_types::Header::try_from(header.clone().client_message).unwrap();
         validate(ctx, router, msg.clone(), Some(header.clone()))?;
-        // solana_program::msg!("Before execute");
-        // solana_program::log::sol_log_compute_units();
         execute(ctx, router, msg, Some(header))?;
-        // solana_program::log::sol_log_compute_units();
-        // solana_program::msg!("After execute");
     } else {
         validate(ctx, router, msg.clone(), None)?;
         execute(ctx, router, msg, None)?;
     }
-    
+
     Ok(())
 }
 
@@ -59,7 +55,12 @@ pub fn dispatch(
 /// That is, the state transition of message `i` must be applied before
 /// message `i+1` is validated. This is equivalent to calling
 /// `dispatch()` on each successively.
-pub fn validate<Ctx>(ctx: &Ctx, router: &impl Router, msg: MsgEnvelope, header: Option<ibc_client_tendermint_types::Header>) -> Result<(), ContextError>
+pub fn validate<Ctx>(
+    ctx: &Ctx,
+    router: &impl Router,
+    msg: MsgEnvelope,
+    header: Option<ibc_client_tendermint_types::Header>,
+) -> Result<(), ContextError>
 where
     Ctx: ValidationContext,
 {
@@ -130,7 +131,7 @@ pub fn execute<Ctx>(
     ctx: &mut Ctx,
     router: &mut impl Router,
     msg: MsgEnvelope,
-    header: Option<ibc_client_tendermint_types::Header>
+    header: Option<ibc_client_tendermint_types::Header>,
 ) -> Result<(), ContextError>
 where
     Ctx: ExecutionContext,

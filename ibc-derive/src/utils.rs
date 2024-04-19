@@ -108,7 +108,7 @@ impl Imports {
     }
 
     pub fn tm_header(&self) -> TokenStream {
-        let prefix = quote!{ ::ibc_client_tendermint_types };
+        let prefix = quote! { ::ibc_client_tendermint_types };
         quote! {#prefix::Header}
     }
 }
