@@ -35,14 +35,17 @@ pub fn dispatch(
             },
             _ => panic!("Invalid message type"),
         };
-        let header =
-            ibc_client_tendermint_types::Header::try_from(header.clone().client_message).unwrap();
-        validate(ctx, router, msg.clone(), Some(header.clone()))?;
-        execute(ctx, router, msg, Some(header))?;
-    } else {
-        validate(ctx, router, msg.clone(), None)?;
-        execute(ctx, router, msg, None)?;
+        if header.client_id.as_str().contains("tendermint") {
+            let header =
+                ibc_client_tendermint_types::Header::try_from(header.clone().client_message)
+                    .unwrap();
+            validate(ctx, router, msg.clone(), Some(header.clone()))?;
+            execute(ctx, router, msg, Some(header))?;
+            return Ok(())
+        }
     }
+    validate(ctx, router, msg.clone(), None)?;
+    execute(ctx, router, msg, None)?;
 
     Ok(())
 }
