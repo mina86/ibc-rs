@@ -27,22 +27,16 @@ pub fn dispatch(
     router: &mut impl Router,
     msg: MsgEnvelope,
 ) -> Result<(), ContextError> {
-    if matches!(msg, MsgEnvelope::Client(ClientMsg::UpdateClient(_))) {
-        let header = match msg {
-            MsgEnvelope::Client(ref msg) => match msg {
-                ClientMsg::UpdateClient(msg) => msg,
-                _ => panic!("Invalid message type"),
-            },
-            _ => panic!("Invalid message type"),
-        };
-        let header =
-            ibc_client_tendermint_types::Header::try_from(header.clone().client_message).unwrap();
-        validate(ctx, router, msg.clone(), Some(header.clone()))?;
-        execute(ctx, router, msg, Some(header))?;
-    } else {
-        validate(ctx, router, msg.clone(), None)?;
-        execute(ctx, router, msg, None)?;
-    }
+    let header = match msg {
+        MsgEnvelope::Client(ClientMsg::UpdateClient(ref msg))
+            if msg.client_id.as_str().contains("tendermint") =>
+        {
+            ibc_client_tendermint_types::Header::try_from(msg.client_message.clone()).ok()
+        }
+        _ => None,
+    };
+    validate(ctx, router, msg.clone(), header.clone())?;
+    execute(ctx, router, msg, header)?;
 
     Ok(())
 }
