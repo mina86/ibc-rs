@@ -31,13 +31,20 @@ where
         .status(ctx.get_client_validation_context(), &client_id)?
         .verify_is_active()?;
 
-    let _client_message = msg.client_message();
+    let client_message = msg.client_message();
 
-    client_state.verify_tm_client_message(
-        ctx.get_client_validation_context(),
-        &client_id,
-        header,
-    )?;
+    match header {
+        Some(_) => client_state.verify_tm_client_message(
+            ctx.get_client_validation_context(),
+            &client_id,
+            header,
+        )?,
+        None => client_state.verify_client_message(
+            ctx.get_client_validation_context(),
+            &client_id,
+            client_message,
+        )?,
+    }
 
     Ok(())
 }
@@ -58,11 +65,18 @@ where
     let client_message = msg.client_message();
     let client_state = ctx.client_state(&client_id)?;
 
-    let found_misbehaviour = client_state.check_for_tm_misbehaviour(
-        ctx.get_client_validation_context(),
-        &client_id,
-        header.clone(),
-    )?;
+    let found_misbehaviour = match header {
+        Some(_) => client_state.check_for_tm_misbehaviour(
+            ctx.get_client_validation_context(),
+            &client_id,
+            header.clone(),
+        )?,
+        None => client_state.check_for_misbehaviour(
+            ctx.get_client_validation_context(),
+            &client_id,
+            client_message.clone(),
+        )?,
+    };
 
     if found_misbehaviour {
         // the client message is not deserialized so
@@ -88,8 +102,18 @@ where
             .into());
         }
 
-        let consensus_heights =
-            client_state.update_tm_state(ctx.get_client_execution_context(), &client_id, header)?;
+        let consensus_heights = match header {
+            Some(_) => client_state.update_tm_state(
+                ctx.get_client_execution_context(),
+                &client_id,
+                header,
+            )?,
+            None => client_state.update_state(
+                ctx.get_client_execution_context(),
+                &client_id,
+                client_message,
+            )?,
+        };
 
         {
             let event = {
