@@ -7,7 +7,7 @@ use ibc_core_client::context::ClientValidationContext;
 use ibc_core_client::types::error::ClientError;
 use ibc_core_client::types::Status;
 use ibc_core_host::types::identifiers::ClientId;
-use ibc_core_host::types::path::ClientConsensusStatePath;
+// use ibc_core_host::types::path::ClientConsensusStatePath;
 use ibc_primitives::prelude::*;
 use ibc_primitives::proto::Any;
 use tendermint::crypto::Sha256;
@@ -209,8 +209,8 @@ where
 /// in order to make the ClientState APIs more flexible.
 pub fn status<V>(
     client_state: &ClientStateType,
-    ctx: &V,
-    client_id: &ClientId,
+    _ctx: &V,
+    _client_id: &ClientId,
 ) -> Result<Status, ClientError>
 where
     V: ClientValidationContext + TmValidationContext,
@@ -219,37 +219,43 @@ where
         return Ok(Status::Frozen);
     }
 
-    let latest_consensus_state: TmConsensusState = {
-        let any_latest_consensus_state = match ctx.consensus_state(&ClientConsensusStatePath::new(
-            client_id.clone(),
-            client_state.latest_height.revision_number(),
-            client_state.latest_height.revision_height(),
-        )) {
-            Ok(cs) => cs,
-            // if the client state does not have an associated consensus state for its latest height
-            // then it must be expired
-            Err(_) => return Ok(Status::Expired),
-        };
-
-        any_latest_consensus_state
-            .try_into()
-            .map_err(|err| ClientError::Other {
-                description: err.to_string(),
-            })?
-    };
-
-    // Note: if the `duration_since()` is `None`, indicating that the latest
-    // consensus state is in the future, then we don't consider the client
-    // to be expired.
-    let now = ctx.host_timestamp()?;
-
-    if let Some(elapsed_since_latest_consensus_state) =
-        now.duration_since(&latest_consensus_state.timestamp().into())
-    {
-        if elapsed_since_latest_consensus_state > client_state.trusting_period {
-            return Ok(Status::Expired);
-        }
-    }
-
+    // TODO: Since there is no way of making a reviving client once expired in the current version of ibc-rs,
+    // we will always return active.
+    // 
+    // Once the ibc-rs is updated, client update to revive a client will be supported which should be used.
     Ok(Status::Active)
+
+    // let latest_consensus_state: TmConsensusState = {
+    //     let any_latest_consensus_state = match ctx.consensus_state(&ClientConsensusStatePath::new(
+    //         client_id.clone(),
+    //         client_state.latest_height.revision_number(),
+    //         client_state.latest_height.revision_height(),
+    //     )) {
+    //         Ok(cs) => cs,
+    //         // if the client state does not have an associated consensus state for its latest height
+    //         // then it must be expired
+    //         Err(_) => return Ok(Status::Expired),
+    //     };
+
+    //     any_latest_consensus_state
+    //         .try_into()
+    //         .map_err(|err| ClientError::Other {
+    //             description: err.to_string(),
+    //         })?
+    // };
+
+    // // Note: if the `duration_since()` is `None`, indicating that the latest
+    // // consensus state is in the future, then we don't consider the client
+    // // to be expired.
+    // let now = ctx.host_timestamp()?;
+
+    // if let Some(elapsed_since_latest_consensus_state) =
+    //     now.duration_since(&latest_consensus_state.timestamp().into())
+    // {
+    //     if elapsed_since_latest_consensus_state > client_state.trusting_period {
+    //         return Ok(Status::Expired);
+    //     }
+    // }
+
+    // Ok(Status::Active)
 }
